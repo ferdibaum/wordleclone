@@ -1,7 +1,17 @@
+import copy from "copy-to-clipboard";
 import { useEffect, useState } from "react";
 import { FiDelete } from "react-icons/fi";
+import { words } from "./words";
 
-const word = "schuh";
+const startDate = new Date("01/09/2022");
+const currentDate = new Date();
+
+const Difference_In_Time = currentDate.getTime() - startDate.getTime();
+
+const Difference_In_Days = Math.floor(Difference_In_Time / (1000 * 3600 * 24));
+
+const word = words[Difference_In_Days];
+
 function App() {
   const [boardState, setBoardState] = useState(["", "", "", "", "", ""]);
 
@@ -17,7 +27,7 @@ function App() {
 
   return (
     <div className="relative flex justify-center w-screen h-screen overflow-y-auto bg-gray-800">
-      {done && <Modal />}
+      {done && <Modal number={Difference_In_Days} boardState={boardState} />}
       <div className="flex flex-col flex-grow h-full max-w-md ">
         <div className="w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 border-opacity-70 ">
           Wordle
@@ -117,11 +127,37 @@ function App() {
   );
 }
 
-function Modal() {
+function Modal({ number, boardState }) {
+  const [buttonText, setButtonText] = useState("Teilen");
+
   return (
     <div class="bg-slate-800 bg-opacity-50 flex justify-center items-center absolute top-0 right-0 bottom-0 left-0">
       <div class="bg-slate-900 px-16 py-14 rounded-md text-center">
         <h1 class="text-xl mb-4 font-bold text-white">Du hast es geschafft!</h1>
+        <button
+          onClick={() => {
+            let textToCopy = `Wortnummer: ${number}\n\n`;
+            for (let i = 0; i < boardState.length; i++) {
+              if (boardState[i]) {
+                for (let j = 0; j < boardState[i].length; j++) {
+                  if (boardState[i][j] === word[j]) {
+                    textToCopy = textToCopy + "🟩";
+                  } else if (word.includes(boardState[i][j])) {
+                    textToCopy = textToCopy + "🟨";
+                  } else {
+                    textToCopy = textToCopy + "⬛";
+                  }
+                }
+                textToCopy = textToCopy + "\n";
+              }
+            }
+            copy(textToCopy);
+            setButtonText("Kopiert!");
+          }}
+          class="bg-green-600 px-4 py-2 rounded-md text-md text-white"
+        >
+          {buttonText}
+        </button>
       </div>
     </div>
   );
