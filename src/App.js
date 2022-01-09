@@ -10,7 +10,7 @@ const Difference_In_Time = currentDate.getTime() - startDate.getTime();
 
 const Difference_In_Days = Math.floor(Difference_In_Time / (1000 * 3600 * 24));
 
-const word = words[Difference_In_Days];
+const word = words[Difference_In_Days].toLowerCase();
 
 function App() {
   const [boardState, setBoardState] = useState(["", "", "", "", "", ""]);
@@ -177,7 +177,7 @@ function WordleRow({ current, currentRow, state }) {
                   ? "rgba(0, 255, 0, 0.5)"
                   : word.includes(char)
                   ? "rgba(255, 255, 0, 0.5)"
-                  : "transparent"
+                  : "rgba(255, 255, 255, 0.5)"
               }
             >
               {char}
