@@ -131,9 +131,11 @@ function Modal({ number, boardState }) {
   const [buttonText, setButtonText] = useState("Teilen");
 
   return (
-    <div class="bg-slate-800 bg-opacity-50 flex justify-center items-center absolute top-0 right-0 bottom-0 left-0">
-      <div class="bg-slate-900 px-16 py-14 rounded-md text-center">
-        <h1 class="text-xl mb-4 font-bold text-white">Du hast es geschafft!</h1>
+    <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-opacity-50 bg-slate-800">
+      <div className="px-16 text-center rounded-md bg-slate-900 py-14">
+        <h1 className="mb-4 text-xl font-bold text-white">
+          Du hast es geschafft!
+        </h1>
         <button
           onClick={() => {
             let textToCopy = `Wortnummer: ${number}\n\n`;
@@ -154,7 +156,7 @@ function Modal({ number, boardState }) {
             copy(textToCopy);
             setButtonText("Kopiert!");
           }}
-          class="bg-green-600 px-4 py-2 rounded-md text-md text-white"
+          className="px-4 py-2 text-white bg-green-600 rounded-md text-md"
         >
           {buttonText}
         </button>
