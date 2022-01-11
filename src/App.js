@@ -30,7 +30,7 @@ function App() {
       {done && <Modal number={Difference_In_Days} boardState={boardState} />}
       <div className="flex flex-col flex-grow h-full max-w-md ">
         <div className="w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 border-opacity-70 ">
-          Wordle
+          Wörtle
         </div>
         <div className="flex flex-col items-center justify-center flex-grow w-full py-3 ">
           {boardState.map((state, index) => (
