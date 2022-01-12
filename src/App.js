@@ -142,9 +142,13 @@ function Modal({ number, boardState }) {
             for (let i = 0; i < boardState.length; i++) {
               if (boardState[i]) {
                 for (let j = 0; j < boardState[i].length; j++) {
-                  if (boardState[i][j] === word[j]) {
+                  if (
+                    getColor(boardState[i], boardState[i][j], j) === "GREEN"
+                  ) {
                     textToCopy = textToCopy + "🟩";
-                  } else if (word.includes(boardState[i][j])) {
+                  } else if (
+                    getColor(boardState[i], boardState[i][j], j) === "YELLOW"
+                  ) {
                     textToCopy = textToCopy + "🟨";
                   } else {
                     textToCopy = textToCopy + "⬛";
@@ -165,6 +169,19 @@ function Modal({ number, boardState }) {
   );
 }
 
+function getColor(guess, char, index) {
+  if (char === word[index]) {
+    return "GREEN";
+  }
+  if (
+    word.includes(char) &&
+    !locations(char, word).every((i) => guess[i] === word[i])
+  ) {
+    return "YELLOW";
+  }
+  return "GRAY";
+}
+
 function WordleRow({ current, currentRow, state }) {
   if (state) {
     return (
@@ -173,9 +190,9 @@ function WordleRow({ current, currentRow, state }) {
           <div className="px-1  w-[15%]" key={i}>
             <WordTile
               color={
-                char === word[i]
+                getColor(state, char, i) === "GREEN"
                   ? "rgba(0, 255, 0, 0.5)"
-                  : word.includes(char)
+                  : getColor(state, char, i) === "YELLOW"
                   ? "rgba(255, 255, 0, 0.5)"
                   : "rgba(255, 255, 255, 0.5)"
               }
@@ -251,6 +268,13 @@ function CharButton({ char, current, setCurrent, boardState }) {
       {char}
     </div>
   );
+}
+
+function locations(substring, string) {
+  var a = [],
+    i = -1;
+  while ((i = string.indexOf(substring, i + 1)) >= 0) a.push(i);
+  return a;
 }
 
 export default App;
