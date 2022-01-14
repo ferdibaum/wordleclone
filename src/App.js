@@ -21,12 +21,17 @@ function App() {
   const [current, setCurrent] = useState("");
 
   const [done, setDone] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const [rulseModal, setRuleModal] = useState(false);
 
   useEffect(() => {
     if (boardState.includes(word)) {
       setDone(true);
+    } else {
+      if (boardState && boardState[boardState.length - 1] !== "") {
+        setFailed(true);
+      }
     }
   }, [boardState]);
 
@@ -41,9 +46,7 @@ function App() {
       {done && (
         <SuccessModal number={Difference_In_Days} boardState={boardState} />
       )}
-      {boardState && boardState[boardState.length - 1] !== "" && (
-        <WrongModal word={word} />
-      )}
+      {failed && <WrongModal word={word} />}
       <div className="flex flex-col flex-grow h-full max-w-md ">
         <div className="w-full flex justify-between items-center py-2 text-3xl ju font-bold text-center text-white uppercase border-b border-gray-400 border-opacity-70 ">
           <div></div>
