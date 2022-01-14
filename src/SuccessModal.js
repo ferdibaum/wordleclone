@@ -1,5 +1,6 @@
 import copy from "copy-to-clipboard";
 import { useState } from "react";
+import { isMobile } from "react-device-detect";
 import { getColor } from "./App";
 export function SuccessModal({ number, boardState }) {
   const [buttonText, setButtonText] = useState("Teilen");
@@ -27,24 +28,27 @@ export function SuccessModal({ number, boardState }) {
                 textToCopy = textToCopy + "\n";
               }
             }
-            if (navigator.share) {
-              try {
-                await navigator
-                  .share({
-                    title: "Result",
-                    text: textToCopy,
-                    url: "https://www.wordles.de/",
-                  })
-                  .then(() =>
-                    console.log("Hooray! Your content was shared to tha world")
+            if (isMobile) {
+              if (navigator.share) {
+                try {
+                  await navigator
+                    .share({
+                      title: "",
+                      text: textToCopy,
+                      url: "",
+                    })
+                    .then(() =>
+                      console.log(
+                        "Hooray! Your content was shared to tha world"
+                      )
+                    );
+                } catch (error) {
+                  console.log(
+                    `Oops! I couldn't share to the world because: ${error}`
                   );
-              } catch (error) {
-                console.log(
-                  `Oops! I couldn't share to the world because: ${error}`
-                );
+                }
               }
-            }
-            copy(textToCopy);
+            } else copy(textToCopy);
             setButtonText("Kopiert!");
           }}
           className="px-4 py-2 text-white bg-green-600 rounded-md text-md"
