@@ -33,9 +33,7 @@ export function SuccessModal({ number, boardState }) {
                 try {
                   await navigator
                     .share({
-                      title: "",
                       text: textToCopy,
-                      url: "",
                     })
                     .then(() =>
                       console.log(
