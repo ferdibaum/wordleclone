@@ -1,7 +1,10 @@
-import copy from "copy-to-clipboard";
 import { useEffect, useState } from "react";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { FiDelete } from "react-icons/fi";
+import { HowToPlayModal } from "./HowToPlayModal";
+import { SuccessModal } from "./SuccessModal";
 import { words } from "./words";
+import { WrongModal } from "./WrongModal";
 
 const startDate = new Date("01/09/2022");
 const currentDate = new Date();
@@ -19,6 +22,8 @@ function App() {
 
   const [done, setDone] = useState(false);
 
+  const [rulseModal, setRuleModal] = useState(false);
+
   useEffect(() => {
     if (boardState.includes(word)) {
       setDone(true);
@@ -27,10 +32,28 @@ function App() {
 
   return (
     <div className="relative flex justify-center w-screen h-screen overflow-y-auto bg-gray-800">
-      {done && <Modal number={Difference_In_Days} boardState={boardState} />}
+      <HowToPlayModal
+        isOpen={rulseModal}
+        onRequestClose={() => {
+          setRuleModal(false);
+        }}
+      />
+      {done && (
+        <SuccessModal number={Difference_In_Days} boardState={boardState} />
+      )}
+      {boardState && boardState[boardState.length - 1] !== "" && (
+        <WrongModal word={word} />
+      )}
       <div className="flex flex-col flex-grow h-full max-w-md ">
-        <div className="w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 border-opacity-70 ">
-          Wörtle
+        <div className="w-full flex justify-between items-center py-2 text-3xl ju font-bold text-center text-white uppercase border-b border-gray-400 border-opacity-70 ">
+          <div></div>
+          <p>Wörtle</p>
+          <AiOutlineQuestionCircle
+            onClick={() => {
+              setRuleModal(true);
+            }}
+            className="cursor-pointer"
+          />
         </div>
         <div className="flex flex-col items-center justify-center flex-grow w-full py-3 ">
           {boardState.map((state, index) => (
@@ -127,55 +150,18 @@ function App() {
   );
 }
 
-function Modal({ number, boardState }) {
-  const [buttonText, setButtonText] = useState("Teilen");
+export function getColor(guess, index) {
+  const charinword = word.split(guess[index]).length - 1;
+  const charbevorindex =
+    guess.substring(0, index).split(guess[index]).length - 1;
 
-  return (
-    <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-opacity-50 bg-slate-800">
-      <div className="px-16 text-center rounded-md bg-slate-900 py-14">
-        <h1 className="mb-4 text-xl font-bold text-white">
-          Du hast es geschafft!
-        </h1>
-        <button
-          onClick={() => {
-            let textToCopy = `Wortnummer: ${number}\n\n`;
-            for (let i = 0; i < boardState.length; i++) {
-              if (boardState[i]) {
-                for (let j = 0; j < boardState[i].length; j++) {
-                  if (
-                    getColor(boardState[i], boardState[i][j], j) === "GREEN"
-                  ) {
-                    textToCopy = textToCopy + "🟩";
-                  } else if (
-                    getColor(boardState[i], boardState[i][j], j) === "YELLOW"
-                  ) {
-                    textToCopy = textToCopy + "🟨";
-                  } else {
-                    textToCopy = textToCopy + "⬛";
-                  }
-                }
-                textToCopy = textToCopy + "\n";
-              }
-            }
-            copy(textToCopy);
-            setButtonText("Kopiert!");
-          }}
-          className="px-4 py-2 text-white bg-green-600 rounded-md text-md"
-        >
-          {buttonText}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function getColor(guess, char, index) {
-  if (char === word[index]) {
+  if (guess[index] === word[index]) {
     return "GREEN";
   }
   if (
-    word.includes(char) &&
-    !locations(char, word).every((i) => guess[i] === word[i])
+    word.includes(guess[index]) &&
+    !locations(guess[index], word).every((i) => guess[i] === word[i]) &&
+    charbevorindex < charinword
   ) {
     return "YELLOW";
   }
@@ -190,9 +176,9 @@ function WordleRow({ current, currentRow, state }) {
           <div className="px-1  w-[15%]" key={i}>
             <WordTile
               color={
-                getColor(state, char, i) === "GREEN"
+                getColor(state, i) === "GREEN"
                   ? "rgba(0, 255, 0, 0.5)"
-                  : getColor(state, char, i) === "YELLOW"
+                  : getColor(state, i) === "YELLOW"
                   ? "rgba(255, 255, 0, 0.5)"
                   : "rgba(255, 255, 255, 0.5)"
               }
@@ -218,7 +204,7 @@ function WordleRow({ current, currentRow, state }) {
   }
 }
 
-function WordTile({ color, children }) {
+export function WordTile({ color, children }) {
   return (
     <div
       style={{ backgroundColor: color }}
@@ -244,7 +230,7 @@ function CharButton({ char, current, setCurrent, boardState }) {
           });
         }
       }}
-      className={`flex items-center justify-center w-full text-white uppercase ${
+      className={`flex items-center cursor-pointer justify-center w-full text-white uppercase ${
         boardState.some((e) => {
           for (let i = 0; i < e.length; i++) {
             if (e[i] === word[i] && e[i] === char) {
