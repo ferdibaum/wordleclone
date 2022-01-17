@@ -18,7 +18,9 @@ const word = words[Difference_In_Days].toLowerCase();
 function App() {
   const [boardState, setBoardState] = useState(
     localStorage.getItem("boardState")
-      ? localStorage.getItem("boardState").split(",")
+      ? word === localStorage.getItem("word")
+        ? localStorage.getItem("boardState").split(",")
+        : ["", "", "", "", "", ""]
       : ["", "", "", "", "", ""]
   );
 
@@ -34,6 +36,7 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("boardState", boardState);
+    localStorage.setItem("word", word);
   }, [boardState]);
 
   useEffect(() => {
