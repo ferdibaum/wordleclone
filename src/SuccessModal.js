@@ -2,12 +2,20 @@ import copy from "copy-to-clipboard";
 import { useState } from "react";
 import { isMobile } from "react-device-detect";
 import { getColor } from "./App";
-export function SuccessModal({ number, boardState }) {
+export function SuccessModal({ number, boardState, onRequestClose }) {
   const [buttonText, setButtonText] = useState("Teilen");
 
   return (
-    <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-opacity-50 bg-slate-800">
-      <div className="px-16 text-center rounded-md bg-slate-900 py-14">
+    <div
+      onClick={onRequestClose}
+      className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-opacity-50 bg-slate-800"
+    >
+      <div
+        onClick={function (e) {
+          e.stopPropagation();
+        }}
+        className="px-16 text-center rounded-md bg-slate-900 py-14"
+      >
         <h1 className="mb-4 text-xl font-bold text-white">
           Du hast es geschafft!
         </h1>

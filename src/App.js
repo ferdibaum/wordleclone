@@ -16,21 +16,34 @@ const Difference_In_Days = Math.floor(Difference_In_Time / (1000 * 3600 * 24));
 const word = words[Difference_In_Days].toLowerCase();
 
 function App() {
-  const [boardState, setBoardState] = useState(["", "", "", "", "", ""]);
+  const [boardState, setBoardState] = useState(
+    localStorage.getItem("boardState")
+      ? localStorage.getItem("boardState").split(",")
+      : ["", "", "", "", "", ""]
+  );
 
   const [current, setCurrent] = useState("");
 
-  const [done, setDone] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [done, setDone] = useState(false);
 
   const [rulseModal, setRuleModal] = useState(false);
 
+  const setCurrentWhenNotDone = done ? () => {} : setCurrent;
+
+  useEffect(() => {
+    localStorage.setItem("boardState", boardState);
+  }, [boardState]);
+
   useEffect(() => {
     if (boardState.includes(word)) {
+      setSuccess(true);
       setDone(true);
     } else {
       if (boardState && boardState[boardState.length - 1] !== "") {
         setFailed(true);
+        setDone(true);
       }
     }
   }, [boardState]);
@@ -43,12 +56,18 @@ function App() {
           setRuleModal(false);
         }}
       />
-      {done && (
-        <SuccessModal number={Difference_In_Days} boardState={boardState} />
+      {success && (
+        <SuccessModal
+          onRequestClose={() => setSuccess(false)}
+          number={Difference_In_Days}
+          boardState={boardState}
+        />
       )}
-      {failed && <WrongModal word={word} />}
+      {failed && (
+        <WrongModal onRequestClose={() => setFailed(false)} word={word} />
+      )}
       <div className="flex flex-col flex-grow h-full max-w-md ">
-        <div className="w-full flex justify-between items-center py-2 text-3xl ju font-bold text-center text-white uppercase border-b border-gray-400 border-opacity-70 ">
+        <div className="flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 ">
           <div></div>
           <p>Wörtle</p>
           <AiOutlineQuestionCircle
@@ -80,7 +99,7 @@ function App() {
                 >
                   <CharButton
                     boardState={boardState}
-                    setCurrent={setCurrent}
+                    setCurrent={setCurrentWhenNotDone}
                     current={current}
                     char={char}
                   />
@@ -98,7 +117,7 @@ function App() {
                 >
                   <CharButton
                     boardState={boardState}
-                    setCurrent={setCurrent}
+                    setCurrent={setCurrentWhenNotDone}
                     current={current}
                     char={char}
                   />
@@ -110,14 +129,18 @@ function App() {
             <div className="flex px-[1%]" style={{ width: "18%" }}>
               <div
                 onClick={() => {
-                  if (current.length === 5 && boardState.indexOf("") >= 0) {
+                  if (
+                    !done &&
+                    current.length === 5 &&
+                    boardState.indexOf("") >= 0
+                  ) {
                     let newBoardState = [...boardState];
                     newBoardState[boardState.indexOf("")] = current;
                     setBoardState(newBoardState);
-                    setCurrent("");
+                    setCurrentWhenNotDone("");
                   }
                 }}
-                className="flex items-center justify-center w-full text-white uppercase bg-gray-400 rounded-md h-14"
+                className="flex items-center justify-center w-full text-white uppercase bg-gray-400 rounded-md cursor-pointer h-14"
               >
                 Enter
               </div>
@@ -126,7 +149,7 @@ function App() {
               <div className="flex px-[1%]" style={{ width: "9%" }} key={char}>
                 <CharButton
                   boardState={boardState}
-                  setCurrent={setCurrent}
+                  setCurrent={setCurrentWhenNotDone}
                   current={current}
                   char={char}
                 />
@@ -136,12 +159,12 @@ function App() {
               <div
                 onClick={() => {
                   if (current.length > 0) {
-                    setCurrent((prev) => {
+                    setCurrentWhenNotDone((prev) => {
                       return prev.substring(0, prev.length - 1);
                     });
                   }
                 }}
-                className="flex items-center justify-center w-full text-white uppercase bg-gray-400 rounded-md h-14"
+                className="flex items-center justify-center w-full text-white uppercase bg-gray-400 rounded-md cursor-pointer h-14"
               >
                 <FiDelete className="w-6 h-6" />
               </div>
