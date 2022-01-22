@@ -15,6 +15,10 @@ const Difference_In_Days = Math.floor(Difference_In_Time / (1000 * 3600 * 24));
 
 const word = words[Difference_In_Days].toLowerCase();
 
+const wordsInLowerCase = words.map(word => word.toLowerCase());
+
+console.log(wordsInLowerCase)
+
 function App() {
   const [boardState, setBoardState] = useState(
     localStorage.getItem("boardState")
@@ -30,7 +34,7 @@ function App() {
   const [failed, setFailed] = useState(false);
   const [done, setDone] = useState(false);
 
-  const [rulseModal, setRuleModal] = useState(false);
+  const [ruleModal, setRuleModal] = useState(false);
 
   const setCurrentWhenNotDone = done ? () => {} : setCurrent;
 
@@ -54,7 +58,7 @@ function App() {
   return (
     <div className="relative flex justify-center w-screen h-screen overflow-y-auto bg-gray-800">
       <HowToPlayModal
-        isOpen={rulseModal}
+        isOpen={ruleModal}
         onRequestClose={() => {
           setRuleModal(false);
         }}
@@ -71,7 +75,6 @@ function App() {
       )}
       <div className="flex flex-col flex-grow h-full max-w-md ">
         <div className="flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 ">
-          <div></div>
           <p>Wörtle</p>
           <AiOutlineQuestionCircle
             onClick={() => {
@@ -135,7 +138,8 @@ function App() {
                   if (
                     !done &&
                     current.length === 5 &&
-                    boardState.indexOf("") >= 0
+                    boardState.indexOf("") >= 0 &&
+                    wordsInLowerCase.includes(current)
                   ) {
                     let newBoardState = [...boardState];
                     newBoardState[boardState.indexOf("")] = current;
@@ -180,8 +184,8 @@ function App() {
 }
 
 export function getColor(guess, index) {
-  const charinword = word.split(guess[index]).length - 1;
-  const charbevorindex =
+  const charInWord = word.split(guess[index]).length - 1;
+  const charBeforeIndex =
     guess.substring(0, index).split(guess[index]).length - 1;
 
   if (guess[index] === word[index]) {
@@ -190,7 +194,7 @@ export function getColor(guess, index) {
   if (
     word.includes(guess[index]) &&
     !locations(guess[index], word).every((i) => guess[i] === word[i]) &&
-    charbevorindex < charinword
+      charBeforeIndex < charInWord
   ) {
     return "YELLOW";
   }
@@ -286,8 +290,8 @@ function CharButton({ char, current, setCurrent, boardState }) {
 }
 
 function locations(substring, string) {
-  var a = [],
-    i = -1;
+  const a = [];
+  let i = -1;
   while ((i = string.indexOf(substring, i + 1)) >= 0) a.push(i);
   return a;
 }
