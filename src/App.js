@@ -16,8 +16,6 @@ const Difference_In_Days = Math.floor(Difference_In_Time / (1000 * 3600 * 24))
 
 const word = words[Difference_In_Days].toLowerCase()
 
-const wordsInLowerCase = words.map(word => word.toLowerCase())
-
 function App() {
     const [boardState, setBoardState] = useState(
         localStorage.getItem('boardState')
