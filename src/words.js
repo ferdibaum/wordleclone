@@ -1547,8 +1547,6 @@ export const words = [
   "Mutti",
   "ulkig",
   "Stich",
-  "Neger",
-  "Juden",
   "Tusch",
   "Puder",
   "Möhre",
