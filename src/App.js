@@ -120,12 +120,7 @@ function App() {
                 onDelete()
             } else {
                 if (chars.includes(e.key.toLowerCase())) {
-                    if (
-                        current.length < 5 &&
-                        !boardState.some((el) => {
-                            return el.includes(e.key.toLowerCase()) && !word.includes(e.key.toLowerCase())
-                        })
-                    ) {
+                    if (current.length < 5) {
                         setCurrentWhenNotDone((prev) => {
                             return prev + e.key.toLowerCase()
                         })
@@ -133,7 +128,7 @@ function App() {
                 }
             }
         },
-        [onDelete, onEnter, setCurrentWhenNotDone, boardState, current.length]
+        [onDelete, onEnter, setCurrentWhenNotDone, current.length]
     )
 
     useEffect(() => {
@@ -282,12 +277,7 @@ function CharButton({ char, current, setCurrent, boardState }) {
     return (
         <div
             onClick={() => {
-                if (
-                    current.length < 5 &&
-                    !boardState.some((e) => {
-                        return e.includes(char) && !word.includes(char)
-                    })
-                ) {
+                if (current.length < 5) {
                     setCurrent((prev) => {
                         return prev + char
                     })
