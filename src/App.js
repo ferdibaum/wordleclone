@@ -1,11 +1,43 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AiOutlineQuestionCircle } from 'react-icons/ai'
 import { FiDelete } from 'react-icons/fi'
 import { HowToPlayModal } from './HowToPlayModal'
 import { SuccessModal } from './SuccessModal'
-import { words } from './words'
 import { wordList } from './validWords'
+import { words } from './words'
 import { WrongModal } from './WrongModal'
+
+const chars = [
+    'q',
+    'w',
+    'e',
+    'r',
+    't',
+    'z',
+    'u',
+    'i',
+    'o',
+    'p',
+    'ü',
+    'a',
+    's',
+    'd',
+    'f',
+    'g',
+    'h',
+    'j',
+    'k',
+    'l',
+    'ö',
+    'ä',
+    'y',
+    'x',
+    'c',
+    'v',
+    'b',
+    'n',
+    'm',
+]
 
 const startDate = new Date('01/09/2022')
 const currentDate = new Date()
@@ -22,7 +54,7 @@ function App() {
             ? word === localStorage.getItem('word')
                 ? localStorage.getItem('boardState').split(',')
                 : ['', '', '', '', '', '']
-            : ['', '', '', '', '', ''],
+            : ['', '', '', '', '', '']
     )
 
     const [current, setCurrent] = useState('')
@@ -33,8 +65,35 @@ function App() {
 
     const [ruleModal, setRuleModal] = useState(false)
 
-    const setCurrentWhenNotDone = done ? () => {
-    } : setCurrent
+    const setCurrentWhenNotDone = useCallback(
+        (s) => {
+            if (!done) {
+                setCurrent(s)
+            }
+        },
+        [done]
+    )
+
+    const onDelete = useCallback(() => {
+        if (current.length > 0) {
+            setCurrentWhenNotDone((prev) => {
+                return prev.substring(0, prev.length - 1)
+            })
+        }
+    }, [setCurrentWhenNotDone, current.length])
+
+    const onEnter = useCallback(() => {
+        if (!done && current.length === 5 && boardState.indexOf('') >= 0) {
+            if (!wordList.includes(current)) {
+                console.warn(`${current} is not a valid word`)
+                return
+            }
+            let newBoardState = [...boardState]
+            newBoardState[boardState.indexOf('')] = current
+            setBoardState(newBoardState)
+            setCurrentWhenNotDone('')
+        }
+    }, [boardState, current, setCurrentWhenNotDone, done])
 
     useEffect(() => {
         localStorage.setItem('boardState', boardState)
@@ -53,27 +112,55 @@ function App() {
         }
     }, [boardState])
 
+    const onKeyboardInput = useCallback(
+        function (e) {
+            if (e.key === 'Enter') {
+                onEnter()
+            } else if (e.key === 'Backspace') {
+                onDelete()
+            } else {
+                if (chars.includes(e.key.toLowerCase())) {
+                    if (
+                        current.length < 5 &&
+                        !boardState.some((el) => {
+                            return el.includes(e.key.toLowerCase()) && !word.includes(e.key.toLowerCase())
+                        })
+                    ) {
+                        setCurrentWhenNotDone((prev) => {
+                            return prev + e.key.toLowerCase()
+                        })
+                    }
+                }
+            }
+        },
+        [onDelete, onEnter, setCurrentWhenNotDone, boardState, current.length]
+    )
+
+    useEffect(() => {
+        document.addEventListener('keydown', onKeyboardInput, false)
+
+        return () => {
+            document.removeEventListener('keydown', onKeyboardInput, false)
+        }
+    }, [onKeyboardInput])
+
     return (
-        <div className='relative flex justify-center w-screen h-screen overflow-y-auto bg-gray-800'>
+        <div
+            onKeyPress={(e) => {
+                console.log(e)
+            }}
+            className='relative flex justify-center w-screen h-screen overflow-y-auto bg-gray-800'
+        >
             <HowToPlayModal
                 isOpen={ruleModal}
                 onRequestClose={() => {
                     setRuleModal(false)
                 }}
             />
-            {success && (
-                <SuccessModal
-                    onRequestClose={() => setSuccess(false)}
-                    number={Difference_In_Days}
-                    boardState={boardState}
-                />
-            )}
-            {failed && (
-                <WrongModal onRequestClose={() => setFailed(false)} word={word} />
-            )}
+            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={Difference_In_Days} boardState={boardState} />}
+            {failed && <WrongModal onRequestClose={() => setFailed(false)} word={word} />}
             <div className='flex flex-col flex-grow h-full max-w-md '>
-                <div
-                    className='flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 '>
+                <div className='flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 '>
                     <p>Wörtle</p>
                     <AiOutlineQuestionCircle
                         onClick={() => {
@@ -85,70 +172,29 @@ function App() {
                 <div className='flex flex-col items-center justify-center flex-grow w-full py-3 '>
                     {boardState.map((state, index) => (
                         <div className='w-full' key={`state-${index}`}>
-                            <WordleRow
-                                currentRow={index === boardState.indexOf('')}
-                                current={current}
-                                state={state}
-                            />
+                            <WordleRow currentRow={index === boardState.indexOf('')} current={current} state={state} />
                         </div>
                     ))}
                 </div>
                 <div className='flex flex-col w-full'>
                     <div className='flex justify-center w-full my-2'>
-                        {['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'ü'].map(
-                            (char) => (
-                                <div
-                                    className='flex px-[1%]'
-                                    style={{ width: '9%' }}
-                                    key={char}
-                                >
-                                    <CharButton
-                                        boardState={boardState}
-                                        setCurrent={setCurrentWhenNotDone}
-                                        current={current}
-                                        char={char}
-                                    />
-                                </div>
-                            ),
-                        )}
+                        {['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'ü'].map((char) => (
+                            <div className='flex px-[1%]' style={{ width: '9%' }} key={char}>
+                                <CharButton boardState={boardState} setCurrent={setCurrentWhenNotDone} current={current} char={char} />
+                            </div>
+                        ))}
                     </div>
                     <div className='flex justify-center w-full my-2'>
-                        {['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö', 'ä'].map(
-                            (char) => (
-                                <div
-                                    className='flex px-[1%]'
-                                    style={{ width: '9%' }}
-                                    key={char}
-                                >
-                                    <CharButton
-                                        boardState={boardState}
-                                        setCurrent={setCurrentWhenNotDone}
-                                        current={current}
-                                        char={char}
-                                    />
-                                </div>
-                            ),
-                        )}
+                        {['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö', 'ä'].map((char) => (
+                            <div className='flex px-[1%]' style={{ width: '9%' }} key={char}>
+                                <CharButton boardState={boardState} setCurrent={setCurrentWhenNotDone} current={current} char={char} />
+                            </div>
+                        ))}
                     </div>
                     <div className='flex justify-center w-full my-2'>
                         <div className='flex px-[1%]' style={{ width: '18%' }}>
                             <div
-                                onClick={() => {
-                                    if (
-                                        !done &&
-                                        current.length === 5 &&
-                                        boardState.indexOf('') >= 0
-                                    ) {
-                                        if (!wordList.includes(current)) {
-                                            console.warn(`${current} is not a valid word`)
-                                            return
-                                        }
-                                        let newBoardState = [...boardState]
-                                        newBoardState[boardState.indexOf('')] = current
-                                        setBoardState(newBoardState)
-                                        setCurrentWhenNotDone('')
-                                    }
-                                }}
+                                onClick={onEnter}
                                 className='flex items-center justify-center w-full text-white uppercase bg-gray-400 rounded-md cursor-pointer h-14'
                             >
                                 Enter
@@ -156,23 +202,12 @@ function App() {
                         </div>
                         {['y', 'x', 'c', 'v', 'b', 'n', 'm'].map((char) => (
                             <div className='flex px-[1%]' style={{ width: '9%' }} key={char}>
-                                <CharButton
-                                    boardState={boardState}
-                                    setCurrent={setCurrentWhenNotDone}
-                                    current={current}
-                                    char={char}
-                                />
+                                <CharButton boardState={boardState} setCurrent={setCurrentWhenNotDone} current={current} char={char} />
                             </div>
                         ))}
                         <div className='flex px-[1%]' style={{ width: '18%' }}>
                             <div
-                                onClick={() => {
-                                    if (current.length > 0) {
-                                        setCurrentWhenNotDone((prev) => {
-                                            return prev.substring(0, prev.length - 1)
-                                        })
-                                    }
-                                }}
+                                onClick={onDelete}
                                 className='flex items-center justify-center w-full text-white uppercase bg-gray-400 rounded-md cursor-pointer h-14'
                             >
                                 <FiDelete className='w-6 h-6' />
@@ -187,17 +222,12 @@ function App() {
 
 export function getColor(guess, index) {
     const charInWord = word.split(guess[index]).length - 1
-    const charBeforeIndex =
-        guess.substring(0, index).split(guess[index]).length - 1
+    const charBeforeIndex = guess.substring(0, index).split(guess[index]).length - 1
 
     if (guess[index] === word[index]) {
         return 'GREEN'
     }
-    if (
-        word.includes(guess[index]) &&
-        !locations(guess[index], word).every((i) => guess[i] === word[i]) &&
-        charBeforeIndex < charInWord
-    ) {
+    if (word.includes(guess[index]) && !locations(guess[index], word).every((i) => guess[i] === word[i]) && charBeforeIndex < charInWord) {
         return 'YELLOW'
     }
     return 'GRAY'
@@ -214,8 +244,8 @@ function WordleRow({ current, currentRow, state }) {
                                 getColor(state, i) === 'GREEN'
                                     ? 'rgba(0, 255, 0, 0.5)'
                                     : getColor(state, i) === 'YELLOW'
-                                        ? 'rgba(255, 255, 0, 0.5)'
-                                        : 'rgba(255, 255, 255, 0.5)'
+                                    ? 'rgba(255, 255, 0, 0.5)'
+                                    : 'rgba(255, 255, 255, 0.5)'
                             }
                         >
                             {char}
@@ -229,9 +259,7 @@ function WordleRow({ current, currentRow, state }) {
             <div className='flex items-center justify-center my-1'>
                 {[...Array(5).keys()].map((i) => (
                     <div className=' px-1  w-[15%]' key={i}>
-                        <WordTile color='transparent'>
-                            {currentRow && current[i] ? current[i] : ''}
-                        </WordTile>
+                        <WordTile color='transparent'>{currentRow && current[i] ? current[i] : ''}</WordTile>
                     </div>
                 ))}
             </div>
@@ -276,14 +304,14 @@ function CharButton({ char, current, setCurrent, boardState }) {
                 })
                     ? 'bg-green-600'
                     : boardState.some((e) => {
-                        return e.includes(char) && word.includes(char)
-                    })
-                        ? 'bg-yellow-400'
-                        : boardState.some((e) => {
-                            return e.includes(char) && !word.includes(char)
-                        })
-                            ? 'bg-gray-900'
-                            : 'bg-gray-400'
+                          return e.includes(char) && word.includes(char)
+                      })
+                    ? 'bg-yellow-400'
+                    : boardState.some((e) => {
+                          return e.includes(char) && !word.includes(char)
+                      })
+                    ? 'bg-gray-900'
+                    : 'bg-gray-400'
             } rounded-md h-14`}
         >
             {char}
