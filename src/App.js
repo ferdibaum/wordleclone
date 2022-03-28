@@ -1,3 +1,4 @@
+import { DateTime, Interval } from 'luxon'
 import { useCallback, useEffect, useState } from 'react'
 import { AiOutlineQuestionCircle } from 'react-icons/ai'
 import { FiDelete } from 'react-icons/fi'
@@ -39,14 +40,11 @@ const chars = [
     'm',
 ]
 
-const startDate = new Date('01/09/2022')
-const currentDate = new Date()
+const startDate = DateTime.fromISO('2022-01-09')
+const currentDate = DateTime.now()
+const differenceInDays = Math.round(Interval.fromDateTimes(startDate, currentDate).length('days'))
 
-const Difference_In_Time = currentDate.getTime() - startDate.getTime()
-
-const Difference_In_Days = Math.floor(Difference_In_Time / (1000 * 3600 * 24))
-
-const word = words[Difference_In_Days].toLowerCase()
+const word = words[differenceInDays].toLowerCase()
 
 function App() {
     const [boardState, setBoardState] = useState(
@@ -152,7 +150,7 @@ function App() {
                     setRuleModal(false)
                 }}
             />
-            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={Difference_In_Days} boardState={boardState} />}
+            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={differenceInDays} boardState={boardState} />}
             {failed && <WrongModal onRequestClose={() => setFailed(false)} word={word} />}
             <div className='flex flex-col flex-grow h-full max-w-md '>
                 <div className='flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 '>
