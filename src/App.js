@@ -42,10 +42,10 @@ const chars = [
 
 const startDate = DateTime.fromISO('2022-01-09')
 const currentDate = DateTime.now()
-const differenceInDays = Math.round(Interval.fromDateTimes(startDate, currentDate).length('days'))
+// Skip one day because of the timezone round bug
+const differenceInDays = Math.round(Interval.fromDateTimes(startDate, currentDate).length('days')) + 1
 
 const word = words[differenceInDays].toLowerCase()
-
 function App() {
     const [boardState, setBoardState] = useState(
         localStorage.getItem('boardState')
