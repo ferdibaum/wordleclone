@@ -42,7 +42,7 @@ const chars = [
 
 const startDate = DateTime.fromISO('2022-01-09')
 const currentDate = DateTime.now()
-const differenceInDays = Math.round(Interval.fromDateTimes(startDate, currentDate).length('days'))
+const differenceInDays = Math.floor(Interval.fromDateTimes(startDate, currentDate).length('days'))
 
 const word = words[differenceInDays].toLowerCase()
 
