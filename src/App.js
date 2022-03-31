@@ -1,4 +1,5 @@
-import { DateTime, Interval } from 'luxon'
+import * as dayjs from 'dayjs'
+import dayOfYear from 'dayjs/plugin/dayOfYear'
 import { useCallback, useEffect, useState } from 'react'
 import { AiOutlineQuestionCircle } from 'react-icons/ai'
 import { FiDelete } from 'react-icons/fi'
@@ -40,12 +41,14 @@ const chars = [
     'm',
 ]
 
-const startDate = DateTime.fromISO('2022-01-09')
-const currentDate = DateTime.now()
-// Skip one day because of the timezone round bug
-const differenceInDays = Math.round(Interval.fromDateTimes(startDate, currentDate).length('days')) + 1
+dayjs.extend(dayOfYear)
 
-const word = words[differenceInDays].toLowerCase()
+const startDate = dayjs('2022-01-09')
+const currentDate = dayjs()
+const index = currentDate.dayOfYear() - startDate.dayOfYear() + 1
+
+const word = words[index].toLowerCase()
+
 function App() {
     const [boardState, setBoardState] = useState(
         localStorage.getItem('boardState')
@@ -150,7 +153,7 @@ function App() {
                     setRuleModal(false)
                 }}
             />
-            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={differenceInDays} boardState={boardState} />}
+            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={index} boardState={boardState} />}
             {failed && <WrongModal onRequestClose={() => setFailed(false)} word={word} />}
             <div className='flex flex-col flex-grow h-full max-w-md '>
                 <div className='flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 '>
