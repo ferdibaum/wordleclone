@@ -120,7 +120,6 @@ export const words = [
     'Lotos',
     'Krise',
     'Silbe',
-    'Raudi',
     'wobei',
     'Trost',
     'Armen',
