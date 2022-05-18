@@ -10,6 +10,7 @@ export const wordList = [
     'regst',
     'talmi',
     'repse',
+    "venus",
     'atout',
     'juwel',
     'zwerg',
