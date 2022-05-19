@@ -7,6 +7,7 @@ export const wordList = [
     'lahne',
     'gelse',
     'reble',
+    "civil",
     'regst',
     'talmi',
     'repse',
