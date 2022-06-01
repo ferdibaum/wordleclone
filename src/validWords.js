@@ -8597,7 +8597,7 @@ export const wordList = [
     'Hafen',
     'einen',
     'Täler',
-    'Datex',
+    'datex',
     'Wände',
     'hinzu',
     'Paket',
