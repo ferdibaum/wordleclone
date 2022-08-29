@@ -85,7 +85,7 @@ function App() {
 
     const onEnter = useCallback(() => {
         if (!done && current.length === 5 && boardState.indexOf('') >= 0) {
-            if (!wordList.includes(current) && !words.includes(current)) {
+            if (!wordList.map(e => e.toLowerCase()).includes(current) && !words.map(e => e.toLowerCase()).includes(current)) {
                 console.warn(`${current} is not a valid word`)
                 return
             }
