@@ -45,9 +45,8 @@ dayjs.extend(dayOfYear)
 
 const startDate = dayjs('2022-01-09')
 const currentDate = dayjs()
-const index = currentDate.dayOfYear() - startDate.dayOfYear() + 1
-
-const word = words[index].toLowerCase()
+const daysSinceStart = currentDate.diff(startDate, 'day')
+const word = words[daysSinceStart].toLowerCase()
 
 function App() {
     const [boardState, setBoardState] = useState(
@@ -85,7 +84,7 @@ function App() {
 
     const onEnter = useCallback(() => {
         if (!done && current.length === 5 && boardState.indexOf('') >= 0) {
-            if (!wordList.map(e => e.toLowerCase()).includes(current) && !words.map(e => e.toLowerCase()).includes(current)) {
+            if (!wordList.map((e) => e.toLowerCase()).includes(current) && !words.map((e) => e.toLowerCase()).includes(current)) {
                 console.warn(`${current} is not a valid word`)
                 return
             }
@@ -153,7 +152,7 @@ function App() {
                     setRuleModal(false)
                 }}
             />
-            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={index} boardState={boardState} />}
+            {success && <SuccessModal onRequestClose={() => setSuccess(false)} number={daysSinceStart} boardState={boardState} />}
             {failed && <WrongModal onRequestClose={() => setFailed(false)} word={word} />}
             <div className='flex flex-col flex-grow h-full max-w-md '>
                 <div className='flex items-center justify-between w-full py-2 text-3xl font-bold text-center text-white uppercase border-b border-gray-400 ju border-opacity-70 '>
