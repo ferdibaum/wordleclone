@@ -46,7 +46,7 @@ dayjs.extend(dayOfYear)
 const startDate = dayjs('2022-01-09')
 const currentDate = dayjs()
 const daysSinceStart = currentDate.diff(startDate, 'day')
-const word = words[daysSinceStart].toLowerCase()
+const word = words[daysSinceStart % words.length].toLowerCase()
 
 function App() {
     const [boardState, setBoardState] = useState(
